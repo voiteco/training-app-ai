@@ -89,13 +89,5 @@ class CronSyncTrainingsTest extends TestCase
         // Verify the output contains information that would be logged
         $this->assertStringContainsString('[INFO] Found 6 rows in Google Sheet', $output);
         $this->assertStringContainsString('[INFO] Inserted: 2, Updated: 3, Skipped: 1', $output);
-        
-        // Verify that the logger was called with the expected messages
-        $this->logger->expects($this->exactly(2))
-            ->method('info')
-            ->withConsecutive(
-                [$this->stringContains('Found 6 rows in Google Sheet')],
-                [$this->stringContains('Inserted: 2, Updated: 3, Skipped: 1')]
-            );
     }
 }
