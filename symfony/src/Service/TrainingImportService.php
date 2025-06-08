@@ -85,7 +85,11 @@ class TrainingImportService
                 $timeString = $row[$columnMap['time']] ?? null;
                 $slots = $row[$columnMap['slots']] ?? null;
                 $price = $row[$columnMap['price']] ?? null;
-                $duration = $row[$columnMap['duration'] ?? -1] ?? 60; // Default to 60 minutes if not provided
+                if (isset($columnMap['duration']) && isset($row[$columnMap['duration']])) {
+                    $duration = $row[$columnMap['duration']];
+                } else {
+                    $duration = 60; // Default to 60 minutes if not provided
+                }
                 
                 // Skip rows with missing required data
                 if (!$title || !$dateString || !$timeString || !$slots || !$price) {
