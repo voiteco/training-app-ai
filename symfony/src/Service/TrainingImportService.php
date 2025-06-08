@@ -80,7 +80,7 @@ class TrainingImportService
                 }
                 
                 $title = $row[$columnMap['title']] ?? null;
-                $description = $row[$columnMap['description'] ?? -1] ?? null;
+                $description = array_key_exists('description', $columnMap) ? ($row[$columnMap['description']] ?? null) : null;
                 $dateString = $row[$columnMap['date']] ?? null;
                 $timeString = $row[$columnMap['time']] ?? null;
                 $slots = $row[$columnMap['slots']] ?? null;
