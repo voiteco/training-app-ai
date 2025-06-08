@@ -12,6 +12,7 @@ A web application for managing and booking training sessions. It integrates with
 - **Mailing**: Symfony Mailer + Messenger  
 - **Monitoring**: Sentry  
 - **API Docs**: Swagger UI (via NelmioApiDocBundle)
+- **Scheduling**: Cron + Supervisor
 
 ## 📦 Features
 
@@ -21,6 +22,7 @@ A web application for managing and booking training sessions. It integrates with
 - Autofill form data using device token  
 - Email confirmation on booking  
 - Admin panel (planned via EasyAdminBundle)
+- Automatic training data synchronization (every 15 minutes)
 
 ## 🛠 Requirements
 
@@ -65,6 +67,16 @@ npm run dev
 
 ```bash
 docker exec php php bin/console app:sync-trainings
+```
+
+## 🔄 Scheduled Tasks
+
+The application automatically synchronizes training data from Google Sheets every 15 minutes using a cron job configured in the PHP container. The synchronization logs are stored in `symfony/var/log/sync.log`.
+
+To verify the cron setup:
+
+```bash
+docker exec php /usr/local/bin/test-cron.sh
 ```
 
 ## 🔗 Access URLs
