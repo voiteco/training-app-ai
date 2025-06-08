@@ -20,7 +20,7 @@ case "$1" in
     docker exec -it php bash
     ;;
   composer)
-    docker exec -it php composer "$2"
+    docker exec -it php composer "${@:2}"
     ;;
   symfony)
     docker exec -it php php bin/console "$2"
