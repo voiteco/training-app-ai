@@ -108,10 +108,12 @@ class TrainingImportService
                     continue;
                 }
                 
-                // Check if training already exists (by title and date)
+                // Generate a unique identifier for this row
+                $rowId = md5($title . $dateString . $timeString);
+                
+                // Check if training already exists (by googleSheetId)
                 $existingTraining = $this->trainingRepository->findOneBy([
-                    'title' => $title,
-                    'date' => $date
+                    'googleSheetId' => $rowId
                 ]);
                 
                 if ($existingTraining) {
@@ -122,7 +124,6 @@ class TrainingImportService
                     $existingTraining->setSlotsAvailable((int) $slots);
                     $existingTraining->setPrice((float) $price);
                     $existingTraining->setDuration((int) $duration);
-                    $existingTraining->setGoogleSheetId($spreadsheetId);
                     $stats['updated']++;
                 } else {
                     // Create new training
@@ -135,7 +136,7 @@ class TrainingImportService
                     $training->setSlotsAvailable((int) $slots);
                     $training->setPrice((float) $price);
                     $training->setDuration((int) $duration);
-                    $training->setGoogleSheetId($spreadsheetId);
+                    $training->setGoogleSheetId($rowId);
                     
                     $this->entityManager->persist($training);
                     $stats['imported']++;

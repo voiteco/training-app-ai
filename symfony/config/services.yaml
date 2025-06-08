@@ -1,5 +1,7 @@
 parameters:
     google_sheets.credentials_path: '%kernel.project_dir%/config/google/credentials.json'
+    google_sheets.spreadsheet_id: '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms' # Default sample spreadsheet ID
+    google_sheets.trainings_range: 'Trainings!A1:H100' # Default range for trainings
 
 services:
     # default configuration for services in *this* file
