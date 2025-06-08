@@ -39,7 +39,10 @@ cd project-folder
 ### 2. Set up environment
 
 ```bash
-cp .env .env.local
+# Copy the environment file
+cp symfony/.env symfony/.env.local
+
+# Start the Docker containers
 docker-compose up -d --build
 ```
 
