@@ -8,6 +8,10 @@
 /vendor/
 ###< symfony/framework-bundle ###
 
+###> google/apiclient ###
+/config/google/credentials.json
+###< google/apiclient ###
+
 ###> phpunit/phpunit ###
 /phpunit.xml
 .phpunit.result.cache
