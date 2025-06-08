@@ -1,0 +1,4 @@
+# Run the training sync command every 15 minutes
+*/15 * * * * cd /var/www/symfony && php bin/console app:sync-trainings >> var/log/sync.log 2>&1
+
+# Empty line at the end of the file is required for cron to work properly
