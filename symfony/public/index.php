@@ -23,7 +23,8 @@ try {
     $pdo = new PDO($dsn, $username, $password);
     echo '<p style="color: green;">MySQL connection successful!</p>';
 } catch (PDOException $e) {
-    echo '<p style="color: red;">MySQL connection failed: ' . $e->getMessage() . '</p>';
+    error_log('MySQL connection failed: ' . $e->getMessage());
+    echo '<p style="color: red;">MySQL connection failed. Please contact the administrator.</p>';
 }
 
 // Test Redis connection
