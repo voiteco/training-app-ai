@@ -30,7 +30,8 @@ WORKDIR /var/www/symfony
 
 # Create log directory
 RUN mkdir -p /var/www/symfony/var/log && \
-    chmod -R 777 /var/www/symfony/var
+    chmod -R 777 /var/www/symfony/var && \
+    mkdir -p /var/log/supervisor
 
 # Copy cron configuration
 COPY crontab /etc/cron.d/symfony-cron
