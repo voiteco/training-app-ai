@@ -20,4 +20,41 @@ class TrainingRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Training::class);
     }
+    
+    /**
+     * Find all upcoming trainings ordered by date and time
+     * 
+     * @return Training[] Returns an array of Training objects
+     */
+    public function findUpcomingTrainings(): array
+    {
+        return $this->createQueryBuilder('t')
+            ->andWhere('t.date >= :today')
+            ->setParameter('today', new \DateTime('today'))
+            ->orderBy('t.date', 'ASC')
+            ->addOrderBy('t.time', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+    
+    /**
+     * Serialize a training entity to an array format suitable for API responses and caching
+     * 
+     * @param Training $training
+     * @return array
+     */
+    public function serializeTraining(Training $training): array
+    {
+        return [
+            'id' => $training->getId(),
+            'title' => $training->getTitle(),
+            'description' => $training->getDescription(),
+            'date' => $training->getDate()->format('Y-m-d'),
+            'time' => $training->getTime()->format('H:i'),
+            'duration' => $training->getDuration(),
+            'slots' => $training->getSlots(),
+            'slotsAvailable' => $training->getSlotsAvailable(),
+            'price' => $training->getPrice(),
+        ];
+    }
 }

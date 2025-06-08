@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Service\TrainingImportService;
+use App\Service\TrainingCacheService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -18,17 +19,20 @@ use Psr\Log\LoggerInterface;
 class SyncTrainingsCommand extends Command
 {
     private TrainingImportService $trainingImportService;
+    private TrainingCacheService $trainingCacheService;
     private string $spreadsheetId;
     private string $range;
     private LoggerInterface $logger;
 
     public function __construct(
         TrainingImportService $trainingImportService,
+        TrainingCacheService $trainingCacheService,
         ParameterBagInterface $parameterBag,
         LoggerInterface $logger
     ) {
         parent::__construct();
         $this->trainingImportService = $trainingImportService;
+        $this->trainingCacheService = $trainingCacheService;
         $this->spreadsheetId = $parameterBag->get('google_sheets.spreadsheet_id');
         $this->range = $parameterBag->get('google_sheets.trainings_range');
         $this->logger = $logger;
@@ -64,6 +68,18 @@ class SyncTrainingsCommand extends Command
             }
             
             if ($stats['imported'] > 0 || $stats['updated'] > 0) {
+                $io->section('Updating Cache');
+                try {
+                    $this->trainingCacheService->refreshTrainingCache();
+                    $io->text("[INFO] Training cache refreshed successfully.");
+                    $this->logger->info("Training cache refreshed successfully.");
+                } catch (\Exception $e) {
+                    $cacheError = "Cache refresh failed: " . $e->getMessage();
+                    $io->text("[WARNING] {$cacheError}");
+                    $this->logger->warning($cacheError);
+                    // Continue execution even if cache refresh fails
+                }
+                
                 $io->success('Training synchronization completed successfully!');
             } else {
                 $io->warning('No trainings were imported or updated.');
