@@ -10,7 +10,7 @@ The application now uses Redis to cache training data after synchronization from
 
 ### Configuration
 
-- Redis connection is configured in `.env` with `CACHE_URL=redis://redis:6379`
+- Redis connection is configured in `.env` with `REDIS_URL=redis://redis:6379`
 - The Symfony Cache component is configured to use Redis in `config/packages/framework.yaml`
 
 ### Components
