@@ -7,7 +7,7 @@
     </div>
     
     <div v-else-if="bookings.length === 0" class="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-8 text-center">
-      <svg class="h-16 w-16 text-gray-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg class="h-16 w-16 text-gray-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
       </svg>
       <h2 class="text-xl font-semibold mb-2">No bookings yet</h2>
