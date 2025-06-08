@@ -10,8 +10,17 @@ echo '<p>PHP version: ' . phpversion() . '</p>';
 
 // Test MySQL connection
 try {
-    $dsn = getenv('DATABASE_URL') ?: 'mysql://root:root_password@mysql:3306/training_booking';
-    $pdo = new PDO($dsn);
+    $databaseUrl = getenv('DATABASE_URL') ?: 'mysql://root:root_password@mysql:3306/training_booking';
+    $urlComponents = parse_url($databaseUrl);
+    $dsn = sprintf(
+        'mysql:host=%s;port=%d;dbname=%s',
+        $urlComponents['host'],
+        $urlComponents['port'] ?? 3306,
+        ltrim($urlComponents['path'], '/')
+    );
+    $username = $urlComponents['user'] ?? null;
+    $password = $urlComponents['pass'] ?? null;
+    $pdo = new PDO($dsn, $username, $password);
     echo '<p style="color: green;">MySQL connection successful!</p>';
 } catch (PDOException $e) {
     echo '<p style="color: red;">MySQL connection failed: ' . $e->getMessage() . '</p>';
