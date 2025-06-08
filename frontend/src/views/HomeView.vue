@@ -19,6 +19,9 @@
         </div>
       </div>
       
+      <!-- API Test Component -->
+      <ApiTest />
+      
       <div class="grid md:grid-cols-2 gap-6">
         <div class="bg-white rounded-lg shadow-lg p-6">
           <h3 class="text-xl font-semibold mb-3 text-blue-600">How It Works</h3>
@@ -47,7 +50,12 @@
 </template>
 
 <script>
+import ApiTest from '@/components/ApiTest.vue'
+
 export default {
-  name: 'HomeView'
+  name: 'HomeView',
+  components: {
+    ApiTest
+  }
 }
 </script>
