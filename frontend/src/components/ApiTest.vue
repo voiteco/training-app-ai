@@ -7,7 +7,7 @@
     <div v-else-if="error" class="text-red-600">
       Error: {{ error }}
     </div>
-    <div v-else class="text-gray-700">
+    <div v-else-if="apiData" class="text-gray-700">
       <p class="mb-2"><strong>Message:</strong> {{ apiData.message }}</p>
       <p class="mb-2"><strong>Status:</strong> {{ apiData.status }}</p>
       <p class="mb-2"><strong>Timestamp:</strong> {{ apiData.timestamp }}</p>
