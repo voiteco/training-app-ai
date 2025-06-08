@@ -15,7 +15,7 @@ class ApiController extends AbstractController
         return $this->json([
             'message' => 'API test endpoint',
             'status' => 'success',
-            'timestamp' => new \DateTime(),
+            'timestamp' => (new \DateTime())->format(\DateTime::ATOM),
         ]);
     }
 }
