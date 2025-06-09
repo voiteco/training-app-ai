@@ -46,13 +46,18 @@ class TrainingCacheService
      */
     public function refreshTrainingCache(?array $trainings = null): array
     {
-        // If trainings are provided, use them; otherwise, fetch from the database
-        if ($trainings === null) {
-            $trainings = $this->trainingRepository->findUpcomingTrainings();
-        }
-        
-        // Serialize and store in cache
-        return $this->storeInCache(self::TRAINING_LIST_CACHE_KEY, $trainings);
+        return $this->cache->get(self::TRAINING_LIST_CACHE_KEY, function (ItemInterface $item) use ($trainings) {
+            $item->expiresAfter(self::CACHE_EXPIRATION);
+
+            // If trainings are provided, use them; otherwise, fetch from the database
+            if ($trainings === null) {
+                $trainingsToCache = $this->trainingRepository->findUpcomingTrainings();
+            } else {
+                $trainingsToCache = $trainings;
+            }
+
+            return $this->serializeTrainings($trainingsToCache);
+        });
     }
     
     /**
