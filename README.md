@@ -6,6 +6,7 @@ A web application for managing and booking training sessions. It integrates with
 
 - **Frontend**: Vue 3 + Vite + Tailwind CSS  
 - **Backend**: Symfony (PHP 8.4)  
+  *The backend is currently configured for PHP 8.4. For broader compatibility or long-term support, consider targeting PHP 8.2 or 8.3.*
 - **Database**: MySQL  
 - **Cache**: Redis  
 - **API Integration**: Google Sheets API  
@@ -97,6 +98,10 @@ docker exec php php bin/phpunit
 - Rate limiting via Symfony RateLimiter  
 - Security headers set in Nginx  
 - Errors tracked with Sentry
+
+## 🔒 Security Considerations
+
+- **Important**: The default Docker setup uses insecure credentials (e.g., `MYSQL_ROOT_PASSWORD=root_password`). These **must** be changed for any production or publicly accessible deployment. Refer to `.env` and `docker-compose.yml` for relevant settings.
 
 ## ✅ TODO
 

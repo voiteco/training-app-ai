@@ -87,6 +87,14 @@ The application uses the following database tables:
    - Stores reviews for trainings
    - Fields: id, training (relation), user (relation, nullable), rating, comment, createdAt
 
+## Future Enhancements & Planned Bundles
+
+The following Symfony bundles are planned for future integration as per the project's technical plan:
+- NelmioApiDocBundle (for enhanced API documentation)
+- Symfony Mailer + Messenger (for asynchronous email notifications)
+- Sentry (for error monitoring)
+- EasyAdminBundle (for an admin panel)
+
 ## Next Steps
 
 1. ✅ Create entities and repositories

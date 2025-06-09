@@ -23,6 +23,10 @@
     <div v-if="loading" class="flex justify-center items-center py-12">
       <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
     </div>
+
+    <div v-else-if="error" class="text-center py-12">
+      <p class="text-xl text-red-500">{{ error }}</p>
+    </div>
     
     <div v-else-if="trainings.length === 0" class="text-center py-12">
       <p class="text-xl text-gray-600">No trainings available at the moment.</p>
@@ -71,41 +75,9 @@ export default {
   name: 'TrainingsView',
   data() {
     return {
-      trainings: [
-        {
-          id: 1,
-          title: 'Introduction to Vue 3',
-          date: '2023-09-15',
-          time: '10:00 - 12:00',
-          description: 'Learn the basics of Vue 3 and its composition API.',
-          spotsAvailable: 5
-        },
-        {
-          id: 2,
-          title: 'Advanced JavaScript Patterns',
-          date: '2023-09-20',
-          time: '14:00 - 16:00',
-          description: 'Dive deep into advanced JavaScript patterns and best practices.',
-          spotsAvailable: 3
-        },
-        {
-          id: 3,
-          title: 'Tailwind CSS Masterclass',
-          date: '2023-09-25',
-          time: '09:00 - 11:00',
-          description: 'Master utility-first CSS with Tailwind CSS framework.',
-          spotsAvailable: 0
-        },
-        {
-          id: 4,
-          title: 'API Integration with Axios',
-          date: '2023-10-05',
-          time: '13:00 - 15:00',
-          description: 'Learn how to integrate APIs in your Vue applications using Axios.',
-          spotsAvailable: 8
-        }
-      ],
-      loading: false,
+      trainings: [],
+      loading: true,
+      error: null,
       searchQuery: ''
     }
   },
@@ -118,6 +90,35 @@ export default {
         training.title.toLowerCase().includes(query) || 
         training.description.toLowerCase().includes(query)
       )
+    }
+  },
+  async mounted() {
+    try {
+      const response = await fetch('/api/trainings');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      // Assuming the API response structure is { status: 'success', source: '...', count: ..., trainings: [...] }
+      // Or if it's directly an array of trainings from the backend response.
+      // For now, let's assume the provided example structure where trainings are nested under a 'trainings' key.
+      // If the actual API returns data.trainings directly, this will need adjustment.
+      if (data && data.trainings) {
+        this.trainings = data.trainings;
+      } else if (Array.isArray(data)) { // Fallback if the API returns an array directly
+        this.trainings = data;
+      } else {
+        // If the structure is different and trainings are not found
+        console.error('Unexpected API response structure:', data);
+        this.trainings = []; // Set to empty if data is not in expected format
+        this.error = 'Failed to load trainings due to unexpected data format.';
+      }
+    } catch (e) {
+      console.error('Failed to fetch trainings:', e);
+      this.error = 'Failed to load trainings. Please try again later.';
+      this.trainings = []; // Ensure trainings is empty on error
+    } finally {
+      this.loading = false;
     }
   }
 }

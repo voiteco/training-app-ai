@@ -6,6 +6,15 @@ use App\Entity\Training;
 use App\Repository\TrainingRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
+/**
+ * Service to import training data from a Google Sheet.
+ *
+ * The `googleSheetId` for each training is generated as an MD5 hash of several training
+ * properties (title, description, date, time, price, slots, duration).
+ * While this minimizes collisions, it's recommended to ensure unique combinations
+ * of these properties in the source sheet or, ideally, use a dedicated unique ID
+ * column in the Google Sheet if possible, and map that to `googleSheetId`.
+ */
 class TrainingImportService
 {
     private GoogleSheetsService $googleSheetsService;
@@ -43,10 +52,11 @@ class TrainingImportService
         }
         
         $headers = array_shift($values);
+        $headersLower = array_map('strtolower', $headers);
         
         // Validate required headers
         $requiredHeaders = ['title', 'date', 'time', 'slots', 'price'];
-        $missingHeaders = array_diff($requiredHeaders, array_map('strtolower', $headers));
+        $missingHeaders = array_diff($requiredHeaders, $headersLower);
         
         if (!empty($missingHeaders)) {
             return [
@@ -59,8 +69,8 @@ class TrainingImportService
         
         // Map column indices
         $columnMap = [];
-        foreach ($headers as $index => $header) {
-            $columnMap[strtolower($header)] = $index;
+        foreach ($headersLower as $index => $header) {
+            $columnMap[$header] = $index;
         }
         
         $stats = [
@@ -73,9 +83,9 @@ class TrainingImportService
         foreach ($values as $rowIndex => $row) {
             try {
                 // Skip rows with insufficient data
-                if (count($row) < count($requiredHeaders)) {
+                if (count($row) < count($requiredHeaders)) { // Check against actual required headers count for core functionality
                     $stats['skipped']++;
-                    $stats['errors'][] = "Row " . ($rowIndex + 2) . " has insufficient data";
+                    $stats['errors'][] = "Skipped row " . ($rowIndex + 2) . ": Insufficient columns. Expected at least " . count($requiredHeaders) . " columns, found " . count($row) . ".";
                     continue;
                 }
                 
@@ -91,10 +101,17 @@ class TrainingImportService
                     $duration = 60; // Default to 60 minutes if not provided
                 }
                 
-                // Skip rows with missing required data
-                if (!$title || !$dateString || !$timeString || !$slots || !$price) {
+                // Check for missing required data
+                $missingFieldsInRow = [];
+                if (!$title) $missingFieldsInRow[] = 'title';
+                if (!$dateString) $missingFieldsInRow[] = 'date';
+                if (!$timeString) $missingFieldsInRow[] = 'time';
+                if ($slots === null || $slots === '') $missingFieldsInRow[] = 'slots'; // Check for null or empty string
+                if ($price === null || $price === '') $missingFieldsInRow[] = 'price'; // Check for null or empty string
+
+                if (!empty($missingFieldsInRow)) {
                     $stats['skipped']++;
-                    $stats['errors'][] = "Row " . ($rowIndex + 2) . " is missing required data";
+                    $stats['errors'][] = "Skipped row " . ($rowIndex + 2) . ": Missing required data for fields: " . implode(', ', $missingFieldsInRow) . ".";
                     continue;
                 }
                 
@@ -104,12 +121,21 @@ class TrainingImportService
                     $time = new \DateTime($timeString);
                 } catch (\Exception $e) {
                     $stats['skipped']++;
-                    $stats['errors'][] = "Row " . ($rowIndex + 2) . " has invalid date/time format";
+                    $stats['errors'][] = "Skipped row " . ($rowIndex + 2) . ": Invalid date/time format for date '" . $dateString . "' or time '" . $timeString . "'.";
                     continue;
                 }
                 
-                // Generate a unique identifier for this row
-                $rowId = md5($title . $dateString . $timeString);
+                // Generate a unique identifier for this row using multiple fields to reduce collision probability.
+                // Fields included: title, description, dateString, timeString, price, slots, duration.
+                $rowId = md5(
+                    ($title ?? '') .
+                    ($description ?? '') .
+                    ($dateString ?? '') .
+                    ($timeString ?? '') .
+                    ($price ?? '') .
+                    ($slots ?? '') .
+                    ($duration ?? '60') // Ensure duration has a value for the hash
+                );
                 
                 // Check if training already exists (by googleSheetId)
                 $existingTraining = $this->trainingRepository->findOneBy([
