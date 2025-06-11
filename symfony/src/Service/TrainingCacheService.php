@@ -51,8 +51,17 @@ class TrainingCacheService
             $trainings = $this->trainingRepository->findUpcomingTrainings();
         }
         
-        // Serialize and store in cache
-        return $this->storeInCache(self::TRAINING_LIST_CACHE_KEY, $trainings);
+        // Delete existing cache item
+        $this->cache->delete(self::TRAINING_LIST_CACHE_KEY);
+        
+        // Serialize trainings
+        $serializedTrainings = $this->serializeTrainings($trainings);
+        
+        // Store in cache using get method which will create the item if it doesn't exist
+        return $this->cache->get(self::TRAINING_LIST_CACHE_KEY, function (ItemInterface $item) use ($serializedTrainings) {
+            $item->expiresAfter(self::CACHE_EXPIRATION);
+            return $serializedTrainings;
+        });
     }
     
     /**
